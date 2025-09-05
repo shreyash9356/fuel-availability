@@ -1,0 +1,37 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  stations  Station[] // 👈 opposite relation (fixed)
+}
+
+model Station {
+  id       Int         @id @default(autoincrement())
+  name     String
+  location String
+  fuel     FuelStatus?
+  userId   Int
+  user     User        @relation(fields: [userId], references: [id])
+}
+
+model FuelStatus {
+  id        Int     @id @default(autoincrement())
+  petrol    Boolean
+  diesel    Boolean
+  cng       Boolean
+  Lng       Boolean
+  Electric  Boolean
+  stationId Int     @unique
+  station   Station @relation(fields: [stationId], references: [id])
+}
